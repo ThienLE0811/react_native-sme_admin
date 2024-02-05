@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
 const Slogan = () => {
   return (
     <View style={styles.view}>
-      <Text style={styles.text}>Người yêu tôi ăn cơm chưa</Text>
+      <Text style={styles.text}></Text>
     </View>
   );
 };
