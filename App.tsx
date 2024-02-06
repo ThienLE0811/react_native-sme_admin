@@ -5,40 +5,29 @@
  * @format
  */
 
-import React from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  useColorScheme,
-} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {SplashScreen} from './src/screens';
 
-import {Colors} from 'react-native/Libraries/NewAppScreen';
-import NavigationTop from './src/components/header/NavigationTop';
-import Slogan from './src/components/main/Slogan';
+import AuthNavigator from './src/navigators/AuthNavigator';
+import {NavigationContainer} from '@react-navigation/native';
 
 function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  const [isShowSplash, setIsShowPlash] = useState<boolean>(true);
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-    paddingHorizontal: 10,
-  };
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setIsShowPlash(false);
+    }, 2000);
 
-  return (
-    <SafeAreaView>
-      <NavigationTop />
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
+    return () => clearTimeout(timeout);
+  }, []);
 
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Slogan />
-      </ScrollView>
-    </SafeAreaView>
+  return isShowSplash ? (
+    <SplashScreen />
+  ) : (
+    <NavigationContainer>
+      <AuthNavigator />
+    </NavigationContainer>
   );
 }
 
