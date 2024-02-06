@@ -10,6 +10,7 @@ import {SplashScreen} from './src/screens';
 
 import AuthNavigator from './src/navigators/AuthNavigator';
 import {NavigationContainer} from '@react-navigation/native';
+import {StatusBar} from 'react-native';
 
 function App(): React.JSX.Element {
   const [isShowSplash, setIsShowPlash] = useState<boolean>(true);
@@ -22,12 +23,21 @@ function App(): React.JSX.Element {
     return () => clearTimeout(timeout);
   }, []);
 
-  return isShowSplash ? (
-    <SplashScreen />
-  ) : (
-    <NavigationContainer>
-      <AuthNavigator />
-    </NavigationContainer>
+  return (
+    <>
+      <StatusBar
+        barStyle={'dark-content'}
+        translucent
+        backgroundColor={'transparent'}
+      />
+      {isShowSplash ? (
+        <SplashScreen />
+      ) : (
+        <NavigationContainer>
+          <AuthNavigator />
+        </NavigationContainer>
+      )}
+    </>
   );
 }
 

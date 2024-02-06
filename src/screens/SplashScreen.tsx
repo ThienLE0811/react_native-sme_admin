@@ -1,29 +1,35 @@
 import React from 'react';
-import {Image, StyleSheet, View} from 'react-native';
+import {
+  ActivityIndicator,
+  Image,
+  ImageBackground,
+  StyleSheet,
+} from 'react-native';
+import {appInfo} from '../constansts/appInfo';
+import {SpaceComponent} from '../components';
+import {appColors} from '../constansts/appColors';
 
 const SplashScreen = () => {
   const styles = StyleSheet.create({
     container: {
-      justifyContent: 'space-between',
-      flexDirection: 'row',
-      paddingVertical: 10,
+      flex: 1,
+      justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: '#baf2d9',
-      paddingHorizontal: 10,
     },
     logo: {
-      width: 180,
-      height: 63,
-    },
-    text: {
-      alignItems: 'center',
+      width: appInfo.sizes.WIDTH * 0.7,
+      resizeMode: 'contain',
     },
   });
 
   return (
-    <View>
-      <Image style={styles.logo} source={require('../assets/home/logo.png')} />
-    </View>
+    <ImageBackground
+      source={require('../assets/home/splash-screen.png')}
+      style={styles.container}>
+      <Image source={require('../assets/home/logo.png')} style={styles.logo} />
+      <SpaceComponent height={16} />
+      <ActivityIndicator color={appColors.gray} size={22} />
+    </ImageBackground>
   );
 };
 
