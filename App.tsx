@@ -22,7 +22,7 @@ function App(): React.JSX.Element {
   useEffect(() => {
     const timeout = setTimeout(() => {
       setIsShowPlash(false);
-    }, 2000);
+    }, 1500);
 
     return () => clearTimeout(timeout);
   }, []);

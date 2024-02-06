@@ -5,13 +5,13 @@ import {fontFamilies} from '../constansts/fontFamilies';
 export const globalStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: appColors.white,
+    // backgroundColor: appColors.white,
   },
 
   text: {
     fontFamily: fontFamilies.regular,
     fontSize: 14,
-    color: appColors.primary,
+    color: appColors.text,
   },
 
   button: {
@@ -23,5 +23,9 @@ export const globalStyles = StyleSheet.create({
     paddingVertical: 16,
     minHeight: 56,
     flexDirection: 'row',
+  },
+  section: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
   },
 });
