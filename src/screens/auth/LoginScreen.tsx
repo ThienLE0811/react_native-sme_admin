@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
-import {Image, StyleSheet} from 'react-native';
+import {Image, StyleSheet, Switch} from 'react-native';
 import {
   ButtonComponent,
+  RowComponent,
   SectionComponent,
   SpaceComponent,
   TextComponent,
@@ -18,7 +19,7 @@ const styles = StyleSheet.create({
   sectionCompoent: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: '30%',
+    marginTop: '25%',
   },
   imageSection: {
     width: appInfo.sizes.WIDTH * 0.7,
@@ -29,11 +30,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: fontFamilies.regular,
   },
+
+  buttonComponent: {
+    marginTop: 20,
+  },
+  rowComponent: {
+    // justifyContent: 'flex-end',
+    gap: 5,
+  },
 });
 
 const LoginScreen = () => {
   const [userName, setUserName] = useState<string>('');
   const [password, setIsPassword] = useState<string>('');
+  const [isRemember, setIsRemember] = useState<boolean>(true);
 
   return (
     <ContainerComponent isImageBackground isScroll>
@@ -63,6 +73,19 @@ const LoginScreen = () => {
           affix={<Lock size={20} color={appColors.gray} />}
         />
 
+        <RowComponent
+          styles={styles.rowComponent}
+          justify="flex-start"
+          onPress={() => setIsRemember(!isRemember)}>
+          <Switch
+            trackColor={{true: appColors.primary}}
+            thumbColor={appColors.white}
+            value={isRemember}
+            onChange={() => setIsRemember(!isRemember)}
+          />
+          <TextComponent text="Ghi nhớ" />
+        </RowComponent>
+
         <ButtonComponent
           text="Đăng nhập"
           onPress={() => console.log('Login')}
@@ -74,6 +97,7 @@ const LoginScreen = () => {
           iconFlex="right"
           type="primary"
           textStyles={styles.textButton}
+          styles={styles.buttonComponent}
         />
       </SectionComponent>
     </ContainerComponent>
