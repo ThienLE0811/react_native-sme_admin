@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
   sectionCompoent: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 150,
+    marginTop: '30%',
   },
   imageSection: {
     width: appInfo.sizes.WIDTH * 0.7,
