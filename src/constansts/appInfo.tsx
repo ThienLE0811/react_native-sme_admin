@@ -6,5 +6,6 @@ export const appInfo = {
     HEIGHT: Dimensions.get('window').height,
   },
   BASE_URL: '',
-  URL_LOGIN: '',
+  URL_LOGIN:
+    'https://gwextdev.seabank.com.vn/seabank/seabank-external/api/v1/website-sme/jwtad/login',
 };

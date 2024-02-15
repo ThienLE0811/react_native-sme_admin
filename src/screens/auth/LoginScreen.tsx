@@ -14,6 +14,10 @@ import {appColors} from '../../constansts/appColors';
 import ContainerComponent from '../../components/ContainerComponent';
 import {appInfo} from '../../constansts/appInfo';
 import {fontFamilies} from '../../constansts/fontFamilies';
+import authenticationAPI from '../../apis/authApi';
+import {useDispatch} from 'react-redux';
+import {addAuth} from '../../redux/reducers/authReducer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const styles = StyleSheet.create({
   sectionCompoent: {
@@ -44,6 +48,27 @@ const LoginScreen = () => {
   const [userName, setUserName] = useState<string>('');
   const [password, setIsPassword] = useState<string>('');
   const [isRemember, setIsRemember] = useState<boolean>(true);
+  // const [isLoading, setIsLoading] = useState<boolean>(false);
+  const dispatch = useDispatch();
+
+  const handleLogin = async () => {
+    try {
+      const res = await authenticationAPI.HandleAuthentication(
+        {
+          username: userName,
+          password: password,
+        },
+        'post',
+      );
+      // console.log('res:: ', res?.data);
+      if (res?.data?.responseCode === '00') {
+        dispatch(addAuth({accessToken: res?.data?.jwt}));
+        await AsyncStorage.setItem('auth', JSON.stringify(res.data));
+      }
+    } catch (error) {
+      console.log('error:: ', String(error));
+    }
+  };
 
   return (
     <ContainerComponent isImageBackground isScroll>
@@ -88,7 +113,7 @@ const LoginScreen = () => {
 
         <ButtonComponent
           text="Đăng nhập"
-          onPress={() => console.log('Login')}
+          onPress={() => handleLogin()}
           // icon={
           //   <View>
           //     <Text>123</Text>
