@@ -60,10 +60,15 @@ const LoginScreen = () => {
         },
         'post',
       );
-      // console.log('res:: ', res?.data);
+      console.log('userName:: ', userName);
       if (res?.data?.responseCode === '00') {
         dispatch(addAuth({accessToken: res?.data?.jwt}));
-        await AsyncStorage.setItem('auth', JSON.stringify(res.data));
+        await AsyncStorage.setItem(
+          'auth',
+          isRemember
+            ? JSON.stringify({accessToken: res?.data?.jwt, userName: userName})
+            : '',
+        );
       }
     } catch (error) {
       console.log('error:: ', String(error));
