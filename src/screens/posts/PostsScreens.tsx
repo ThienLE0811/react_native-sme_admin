@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
+  Platform,
   SafeAreaView,
   StatusBar,
   StyleSheet,
@@ -15,30 +16,44 @@ import {appColors} from '../../constansts/appColors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import postsApi from '../../apis/posts';
 import {appInfo} from '../../constansts/appInfo';
+import {Add, Back} from 'iconsax-react-native';
 
 const styles = StyleSheet.create({
   sectionComponent: {
     paddingTop: StatusBar.currentHeight || 0,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     paddingBottom: 50,
+    backgroundColor: appColors.white,
   },
   item: {
     backgroundColor: appColors.white,
-    padding: 18,
+    padding: 10,
     marginVertical: 8,
+    marginHorizontal: 2,
     borderRadius: 10,
     display: 'flex',
+    ...Platform.select({
+      ios: {
+        shadowColor: 'rgba(99, 99, 99, 0.2)',
+        shadowOffset: {width: 0, height: 1},
+        shadowOpacity: 0.8,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
   },
   title: {
     fontSize: 16,
     flex: 1,
   },
   rowComponent: {
-    gap: 5,
+    gap: 10,
   },
   logo: {
     width: appInfo.sizes.WIDTH * 0.2,
-    height: 58,
+    height: 68,
     // resizeMode: 'contain',
   },
 });
@@ -57,7 +72,7 @@ const Item = ({title, thumbUrl, onPressDetail, onPressUpdate}: ItemProps) => {
     <View style={styles.item}>
       <RowComponent
         styles={styles.rowComponent}
-        justify="space-between"
+        justify="space-around"
         onPress={onPressDetail}>
         <Image
           source={{
@@ -65,7 +80,7 @@ const Item = ({title, thumbUrl, onPressDetail, onPressUpdate}: ItemProps) => {
           }}
           style={styles.logo}
         />
-        <Text style={styles.title} numberOfLines={2}>
+        <Text style={styles.title} numberOfLines={3}>
           {title}
         </Text>
         <TouchableOpacity onPress={onPressUpdate}>
@@ -114,7 +129,12 @@ const PostsScreens = ({navigation}: any) => {
   return (
     <>
       <SafeAreaView style={styles.sectionComponent}>
-        <TextComponent text="Danh sách bài viết" title />
+        <RowComponent justify="space-between">
+          <TextComponent text="Danh sách bài viết" title />
+          <TouchableOpacity onPress={() => navigation.navigate('Main')}>
+            <Add size={28} color={appColors.primary} />
+          </TouchableOpacity>
+        </RowComponent>
         <SpaceComponent height={10} />
 
         {listPosts.length > 0 ? (
