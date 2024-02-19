@@ -20,6 +20,7 @@ interface Props {
   isPassword?: boolean;
   allowClear?: boolean;
   type?: KeyboardType;
+  defaultValue?: string;
 }
 
 const styles = StyleSheet.create({
@@ -32,7 +33,8 @@ const styles = StyleSheet.create({
     minHeight: 56,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 15,
+    paddingRight: 10,
+    paddingLeft: 2,
     backgroundColor: appColors.white,
     marginBottom: 19,
   },
@@ -55,16 +57,20 @@ const InputComponent = (props: Props) => {
     isPassword,
     type,
     allowClear,
+    defaultValue,
   } = props;
   const [isShowPassword, setIsShowPassword] = useState<boolean>(
     isPassword ?? false, // neu undefind la false
   );
+  console.log('default Value:: ', defaultValue);
+
   return (
     <View style={[styles.inputContainer]}>
       {affix ?? affix}
       <TextInput
         style={[styles.input, globalStyles.text]}
         value={value}
+        defaultValue={defaultValue}
         placeholder={placeHolder ?? ''}
         onChangeText={val => onChange(val)}
         secureTextEntry={isShowPassword}

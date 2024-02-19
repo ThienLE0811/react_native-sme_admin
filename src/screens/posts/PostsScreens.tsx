@@ -1,6 +1,8 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   FlatList,
+  Image,
   SafeAreaView,
   StatusBar,
   StyleSheet,
@@ -11,11 +13,14 @@ import {
 import {RowComponent, SpaceComponent, TextComponent} from '../../components';
 import {appColors} from '../../constansts/appColors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import postsApi from '../../apis/posts';
+import {appInfo} from '../../constansts/appInfo';
 
 const styles = StyleSheet.create({
   sectionComponent: {
     paddingTop: StatusBar.currentHeight || 0,
     paddingHorizontal: 20,
+    paddingBottom: 50,
   },
   item: {
     backgroundColor: appColors.white,
@@ -25,87 +30,111 @@ const styles = StyleSheet.create({
     display: 'flex',
   },
   title: {
-    fontSize: 20,
+    fontSize: 16,
     flex: 1,
   },
   rowComponent: {
     gap: 5,
   },
+  logo: {
+    width: appInfo.sizes.WIDTH * 0.2,
+    height: 58,
+    // resizeMode: 'contain',
+  },
 });
-const DATA = [
-  {
-    id: 1,
-    title:
-      'First Item sdsd sdsd sdsdsd sdsd sdsd sdsds  sds sdsdsd dsd  sds 12345555',
-  },
-  {
-    id: 2,
-    title: 'Second Item',
-  },
-  {
-    id: 3,
-    title: 'Third Item',
-  },
-  {
-    id: 4,
-    title: 'Third Item',
-  },
-  {
-    id: 5,
-    title: 'Third Item',
-  },
-  {
-    id: 6,
-    title: 'Third Item',
-  },
-  {
-    id: 7,
-    title: 'Third Item',
-  },
-  {
-    id: 8,
-    title: 'Third Item',
-  },
-];
 
-type ItemProps = {title: string};
+type ItemProps = {
+  title: string;
+  thumbUrl?: string;
+  onPressDetail: () => void;
+  onPressUpdate: () => void;
+};
 
-const Item = ({title}: ItemProps) => {
+const Item = ({title, thumbUrl, onPressDetail, onPressUpdate}: ItemProps) => {
+  console.log('thumbUrl:: ', thumbUrl);
+
   return (
     <View style={styles.item}>
       <RowComponent
         styles={styles.rowComponent}
         justify="space-between"
-        onPress={() => console.log('123')}>
+        onPress={onPressDetail}>
+        <Image
+          source={{
+            uri: thumbUrl,
+          }}
+          style={styles.logo}
+        />
         <Text style={styles.title} numberOfLines={2}>
           {title}
         </Text>
-        <TouchableOpacity onPress={() => console.log('123')}>
+        <TouchableOpacity onPress={onPressUpdate}>
           <FontAwesome name={'edit'} size={20} color={appColors.gray} />
         </TouchableOpacity>
       </RowComponent>
-
-      {/* <View style={{width: 'auto'}}>
-        <Button
-          title="Sửa "
-          onPress={() => console.log('!23')}
-          color={appColors.primary}></Button>
-      </View> */}
     </View>
   );
 };
 
-const PostsScreens = () => {
+const PostsScreens = ({navigation}: any) => {
+  const [listPosts, setListPosts] = useState<Array<Posts>>([]);
+
+  useEffect(() => {
+    try {
+      const getListPosts = async () => {
+        const res = await postsApi.HandleGetListPosts(
+          {
+            start: 0,
+            limit: 10,
+          },
+          'POST',
+        );
+        if (res.data.body.status === 'OK') {
+          setListPosts(res?.data?.body?.data?.items);
+        }
+      };
+
+      getListPosts();
+    } catch (error) {
+      console.log('err:: ', error);
+    }
+  }, []);
+
+  const handleShowDetailPosts = ({id}: {id: number}) => {
+    navigation.navigate('Detail Posts', {
+      id: id,
+    });
+  };
+  const handleShowUpdatePosts = ({id}: {id: number}) => {
+    navigation.navigate('Update Posts', {
+      id: id,
+    });
+  };
+
   return (
     <>
       <SafeAreaView style={styles.sectionComponent}>
         <TextComponent text="Danh sách bài viết" title />
         <SpaceComponent height={10} />
-        <FlatList
-          data={DATA}
-          renderItem={({item}) => <Item title={item.title} />}
-          keyExtractor={item => item.id.toString()}
-        />
+
+        {listPosts.length > 0 ? (
+          <FlatList
+            data={listPosts}
+            renderItem={({item}) => {
+              return (
+                <Item
+                  title={item.titleVi}
+                  thumbUrl={item.thumbUrl}
+                  onPressDetail={() => handleShowDetailPosts({id: item.id})}
+                  onPressUpdate={() => handleShowUpdatePosts({id: item.id})}
+                />
+              );
+            }}
+            keyExtractor={item => item?.slug}
+          />
+        ) : (
+          <ActivityIndicator color={appColors.gray} size={22} />
+        )}
       </SafeAreaView>
     </>
   );

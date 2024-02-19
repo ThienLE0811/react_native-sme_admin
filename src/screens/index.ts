@@ -4,7 +4,9 @@ import LoginScreen from './auth/LoginScreen';
 import BannerScreens from './banners/BannerScreens';
 import CustomerScreens from './customers/CustomerScreens';
 import HomeScreen from './home/HomeScreen';
+import DetailPostsScreens from './posts/DetailPostsScreens';
 import PostsScreens from './posts/PostsScreens';
+import UpdatePostsScreeens from './posts/UpdatePostsScreeens';
 
 export {
   HomeScreen,
@@ -14,4 +16,6 @@ export {
   BannerScreens,
   CustomerScreens,
   PostsScreens,
+  DetailPostsScreens,
+  UpdatePostsScreeens,
 };
