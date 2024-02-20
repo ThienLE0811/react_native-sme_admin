@@ -62,7 +62,6 @@ const InputComponent = (props: Props) => {
   const [isShowPassword, setIsShowPassword] = useState<boolean>(
     isPassword ?? false, // neu undefind la false
   );
-  console.log('default Value:: ', defaultValue);
 
   return (
     <View style={[styles.inputContainer]}>
@@ -91,7 +90,7 @@ const InputComponent = (props: Props) => {
             color={appColors.gray}
           />
         ) : (
-          value.length > 0 &&
+          value?.length > 0 &&
           allowClear && (
             <AntDesign name="close" size={20} color={appColors.text} />
           )

@@ -1,12 +1,13 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
-  ActivityIndicator,
   Button,
+  Pressable,
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Switch,
+  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -17,12 +18,11 @@ import InputComponent from '../../components/InputComponent';
 import {fontFamilies} from '../../constansts/fontFamilies';
 import postsApi from '../../apis/posts';
 import {useDispatch} from 'react-redux';
-import {AppDispatch} from '../../types';
-import {updateListPosts} from '../../redux/reducers/postsReducer';
+import {createPosts} from '../../redux/reducers/postsReducer';
 
 const styles = StyleSheet.create({
   sectionComponent: {
-    paddingTop: Number(StatusBar.currentHeight) + 10 || 0,
+    paddingTop: StatusBar.currentHeight || 0,
     paddingBottom: 10,
     paddingHorizontal: 10,
     flex: 1,
@@ -49,17 +49,29 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   detailSwitch: {
+    // flex: 1,
     justifyContent: 'flex-start',
     flexDirection: 'row',
   },
-  contentScrollView: {
-    paddingBottom: 5,
+  button: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    elevation: 3,
+    backgroundColor: appColors.primary,
+  },
+  textButton: {
+    color: 'white',
+    fontSize: 16,
+
+    fontFamily: fontFamilies.medium,
   },
 });
 
-const UpdatePostsScreeens = ({route, navigation}: any) => {
-  const dispatch = useDispatch<AppDispatch>();
-  const [detailPosts, setDetailPosts] = useState<Posts>();
+const CreatePostsScreeens = ({navigation}: any) => {
+  const dispatch = useDispatch();
   const [title, setTiltle] = useState<string>('');
   const [slugs, setSlug] = useState<string>('');
   const [description, setDescription] = useState<string>('');
@@ -70,69 +82,24 @@ const UpdatePostsScreeens = ({route, navigation}: any) => {
   const [thumbUrl, setThumbUrl] = useState<string>('');
   const [coverImage, setCoverImage] = useState<string>('');
 
-  const {id} = route.params;
-
-  useEffect(() => {
+  const handleCreatePosts = async () => {
     try {
-      const getListPosts = async () => {
-        const res = await postsApi.HandleGetDetailPosts(id, 'POST');
-
-        if (res.data.body.status === 'OK') {
-          setDetailPosts(res?.data?.body?.data);
-          setTiltle(res?.data?.body?.data?.titleVi);
-          setSlug(res?.data?.body?.data?.slug);
-          setDescription(res?.data?.body?.data?.descriptionVi);
-          setContentVi(res?.data?.body?.data?.contentVi);
-          setIsPublic(res?.data?.body?.data?.active);
-          setIsOutstanding(res?.data?.body?.data?.outstanding);
-          setCreatedTime(res?.data?.body?.data?.createdTime);
-          setThumbUrl(res?.data?.body?.data?.thumbUrl);
-          setCoverImage(res?.data?.body?.data?.coverImage);
-        }
-      };
-
-      getListPosts();
-    } catch (error) {
-      console.log('err:: ', error);
-    }
-  }, []);
-
-  const handleUpdatePosts = async () => {
-    try {
-      const res =
-        detailPosts &&
-        (await postsApi.HandleUpdatePosts(
-          {
-            id: detailPosts.id,
-            active: isPublic,
-            titleVi: title,
-            slug: slugs,
-            descriptionVi: description,
-            contentVi: contentVi,
-            thumbUrl: thumbUrl,
-            outstanding: isOutstanding,
-            categories: detailPosts.categories.map(value => value.id),
-            createdTime: 1705510800000,
-          },
-          'POST',
-        ));
-      // dispatch(
-      //   updatePosts({
-      //     id: detailPosts.id,
-      //     active: isPublic,
-      //     titleVi: title,
-      //     slug: slugs,
-      //     descriptionVi: description,
-      //     contentVi: contentVi,
-      //     thumbUrl: thumbUrl,
-      //     outstanding: isOutstanding,
-      //     categories: detailPosts.categories.map(value => value.id),
-      //     createdTime: 1705510800000,
-      //   }),
-      // );
+      const res = await postsApi.HandleCreatePosts(
+        {
+          active: isPublic,
+          titleVi: title,
+          slug: slugs,
+          descriptionVi: description,
+          contentVi: contentVi,
+          thumbUrl: thumbUrl,
+          outstanding: isOutstanding,
+          categories: [8],
+          createdTime: 1705510800000,
+        },
+        'POST',
+      );
       if (res?.data.body.status === 'OK') {
-        dispatch(updateListPosts(res?.data.body.data));
-
+        dispatch(createPosts(res?.data.body.data));
         navigation.navigate('Main');
       }
     } catch (error) {}
@@ -144,17 +111,13 @@ const UpdatePostsScreeens = ({route, navigation}: any) => {
         <TouchableOpacity onPress={() => navigation.navigate('Main')}>
           <Back size={28} color={appColors.text} />
         </TouchableOpacity>
-        <TextComponent text="Cập nhật bài viết" title />
+        <TextComponent text="Tạo mới bài viết" title />
       </RowComponent>
       <SpaceComponent height={10} />
-      {detailPosts ? (
+      {
         <>
-          <TextComponent
-            text={detailPosts?.titleVi || ''}
-            styles={styles.title}
-          />
           <SpaceComponent height={10} />
-          <ScrollView style={styles.contentScrollView}>
+          <ScrollView>
             <View style={styles.input}>
               <TextComponent text={'Tiêu đề'} styles={styles.label} />
               <InputComponent
@@ -162,7 +125,6 @@ const UpdatePostsScreeens = ({route, navigation}: any) => {
                 onChange={val => setTiltle(val)}
                 placeHolder="Nhập tiêu đề bài viết"
                 allowClear
-                defaultValue={detailPosts?.titleVi}
               />
             </View>
             <View style={styles.input}>
@@ -257,18 +219,21 @@ const UpdatePostsScreeens = ({route, navigation}: any) => {
               />
             </View>
 
-            <Button
-              title="Cập nhật"
+            {/* <Button
+              title="Tạo mới"
               color={appColors.primary}
-              onPress={() => handleUpdatePosts()}
-            />
+              onPress={() => handleCreatePosts()}
+            /> */}
+            <Pressable
+              style={styles.button}
+              onPress={() => handleCreatePosts()}>
+              <Text style={styles.textButton}>Tạo mới</Text>
+            </Pressable>
           </ScrollView>
         </>
-      ) : (
-        <ActivityIndicator color={appColors.gray} size={22} />
-      )}
+      }
     </SafeAreaView>
   );
 };
 
-export default UpdatePostsScreeens;
+export default CreatePostsScreeens;

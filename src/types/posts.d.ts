@@ -71,3 +71,15 @@ interface UpdatePosts {
   categories: Array<number>;
   createdTime: number;
 }
+
+interface CreatePosts {
+  active: boolean;
+  titleVi: string;
+  slug: string;
+  descriptionVi: string;
+  contentVi: string;
+  thumbUrl: string;
+  outstanding: boolean;
+  categories: Array<number>;
+  createdTime: number;
+}

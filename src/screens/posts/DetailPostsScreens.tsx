@@ -8,17 +8,21 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {RowComponent, TextComponent} from '../../components';
-import {Back} from 'iconsax-react-native';
+import {Back, Bag, Edit} from 'iconsax-react-native';
 import {appColors} from '../../constansts/appColors';
 import postsApi from '../../apis/posts';
 import {fontFamilies} from '../../constansts/fontFamilies';
 import RenderHtml from '../../components/RenderHtml';
+import {deletePosts} from '../../redux/reducers/postsReducer';
+import {useDispatch} from 'react-redux';
 
 const styles = StyleSheet.create({
   sectionComponent: {
-    paddingTop: StatusBar.currentHeight || 0,
-    paddingBottom: 120,
+    paddingTop: Number(StatusBar.currentHeight) + 10 || 0,
+    paddingBottom: 20,
     paddingHorizontal: 20,
+    flex: 1,
+    backgroundColor: appColors.white,
   },
   rowComponent: {
     gap: 5,
@@ -33,9 +37,13 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     color: appColors.gray,
   },
+  textComponent: {
+    marginLeft: 5,
+  },
 });
 
 const DetailPostsScreens = ({route, navigation}: any) => {
+  const dispatch = useDispatch();
   const {id} = route.params;
   const [detailPosts, setDetailPosts] = useState<Posts>();
 
@@ -43,7 +51,7 @@ const DetailPostsScreens = ({route, navigation}: any) => {
     try {
       const getListPosts = async () => {
         const res = await postsApi.HandleGetDetailPosts(id, 'POST');
-        console.log('res:: ', res.data);
+
         if (res.data.body.status === 'OK') {
           setDetailPosts(res?.data?.body?.data);
         }
@@ -55,13 +63,49 @@ const DetailPostsScreens = ({route, navigation}: any) => {
     }
   }, []);
 
+  const handleDeletePosts = async () => {
+    try {
+      const res = await postsApi.HandleDeletePosts(
+        detailPosts ? [detailPosts?.id] : [],
+
+        'POST',
+      );
+
+      if (res?.data.body.status === 'OK') {
+        dispatch(deletePosts(detailPosts?.id));
+        navigation.navigate('Main');
+      }
+    } catch (error) {}
+  };
+
+  const handleShowUpdatePosts = () => {
+    navigation.navigate('Update Posts', {
+      id: detailPosts?.id,
+    });
+  };
+
   return (
     <SafeAreaView style={styles.sectionComponent}>
-      <RowComponent justify="flex-start" styles={styles.rowComponent}>
-        <TouchableOpacity onPress={() => navigation.navigate('Main')}>
-          <Back size={28} color={appColors.text} />
-        </TouchableOpacity>
-        <TextComponent text={'Chi tiết bài viết: '} title />
+      <RowComponent justify="space-between" styles={styles.rowComponent}>
+        <RowComponent>
+          <TouchableOpacity onPress={() => navigation.navigate('Main')}>
+            <Back size={28} color={appColors.text} />
+          </TouchableOpacity>
+          <TextComponent
+            text={'Chi tiết bài viết: '}
+            title
+            styles={styles.textComponent}
+          />
+        </RowComponent>
+
+        <RowComponent styles={styles.rowComponent}>
+          <TouchableOpacity onPress={() => handleDeletePosts()}>
+            <Bag size={24} color={appColors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleShowUpdatePosts()}>
+            <Edit size={24} color={appColors.gray} />
+          </TouchableOpacity>
+        </RowComponent>
       </RowComponent>
 
       {detailPosts ? (
