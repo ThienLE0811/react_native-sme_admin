@@ -12,14 +12,15 @@ import {StatusBar} from 'react-native';
 import {Provider} from 'react-redux';
 import store from './src/redux/store';
 import AppRouters from './src/navigators/AppRouter';
+import {appColors} from './src/constansts/appColors';
 
 function App(): React.JSX.Element {
   return (
     <>
       <StatusBar
-        barStyle={'dark-content'}
+        barStyle={'default'}
         translucent
-        backgroundColor={'transparent'}
+        backgroundColor={appColors.primary}
       />
       <Provider store={store}>
         <NavigationContainer>

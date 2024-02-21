@@ -11,13 +11,15 @@ interface Props {
   font?: string;
   styles?: StyleProp<TextStyle>;
   title?: boolean;
+  numberOfLine?: number;
 }
 
 const TextComponent = (props: Props) => {
-  const {text, size, color, flex, styles, font, title} = props;
+  const {text, size, color, flex, styles, font, title, numberOfLine} = props;
 
   return (
     <Text
+      numberOfLines={numberOfLine}
       style={[
         // eslint-disable-next-line react-native/no-inline-styles
         {
