@@ -102,6 +102,7 @@ class PostsApi {
           outstanding: data.outstanding,
           categories: data.categories,
           createdTime: data.createdTime,
+          coverImage: data.coverImage,
           slug: data.slug,
         }),
       },

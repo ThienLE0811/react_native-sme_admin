@@ -59,6 +59,15 @@ type GetDetailPostReq = {
 
 interface GetDetailPostRes extends DetailNews {}
 
+interface UpdatePostsForm {
+  titleVi: string;
+  slug: string;
+  descriptionVi: string;
+  contentVi: string;
+  thumbUrl: string;
+  coverImage: string;
+}
+
 interface UpdatePosts {
   id: number;
   active: boolean;
@@ -70,6 +79,7 @@ interface UpdatePosts {
   outstanding: boolean;
   categories: Array<number>;
   createdTime: number;
+  coverImage: string;
 }
 
 interface CreatePosts {
@@ -82,4 +92,5 @@ interface CreatePosts {
   outstanding: boolean;
   categories: Array<number>;
   createdTime: number;
+  coverImage: string;
 }

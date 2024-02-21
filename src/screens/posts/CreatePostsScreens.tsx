@@ -1,28 +1,35 @@
 import React, {useState} from 'react';
 import {
   Button,
-  Pressable,
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Switch,
-  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {RowComponent, SpaceComponent, TextComponent} from '../../components';
+import {
+  InputComponent2,
+  RowComponent,
+  SpaceComponent,
+  TextComponent,
+  TextError,
+} from '../../components';
 import {appColors} from '../../constansts/appColors';
 import {Back} from 'iconsax-react-native';
-import InputComponent from '../../components/InputComponent';
 import {fontFamilies} from '../../constansts/fontFamilies';
 import postsApi from '../../apis/posts';
 import {useDispatch} from 'react-redux';
+import {AppDispatch} from '../../types';
 import {createPosts} from '../../redux/reducers/postsReducer';
+import {useForm} from 'react-hook-form';
+import * as yup from 'yup';
+import {yupResolver} from '@hookform/resolvers/yup';
 
 const styles = StyleSheet.create({
   sectionComponent: {
-    paddingTop: StatusBar.currentHeight || 0,
+    paddingTop: Number(StatusBar.currentHeight) + 10 || 0,
     paddingBottom: 10,
     paddingHorizontal: 10,
     flex: 1,
@@ -49,57 +56,74 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   detailSwitch: {
-    // flex: 1,
     justifyContent: 'flex-start',
     flexDirection: 'row',
   },
-  button: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 8,
-    elevation: 3,
-    backgroundColor: appColors.primary,
+  contentScrollView: {
+    paddingBottom: 5,
   },
-  textButton: {
-    color: 'white',
-    fontSize: 16,
-
-    fontFamily: fontFamilies.medium,
+  error: {
+    color: 'red',
   },
 });
 
+const schema = yup.object().shape({
+  titleVi: yup.string().max(255).required(),
+  slug: yup.string().required(),
+  descriptionVi: yup.string().max(5000).required(),
+  contentVi: yup.string().required(),
+  thumbUrl: yup.string().required(),
+  coverImage: yup.string().required(),
+  // categories: ,
+  createdTime: yup.string().required(),
+});
+
 const CreatePostsScreeens = ({navigation}: any) => {
-  const dispatch = useDispatch();
-  const [title, setTiltle] = useState<string>('');
-  const [slugs, setSlug] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
-  const [contentVi, setContentVi] = useState<string>('');
+  const dispatch = useDispatch<AppDispatch>();
+
   const [isPublic, setIsPublic] = useState<boolean>(false);
   const [isOutstanding, setIsOutstanding] = useState<boolean>(false);
-  const [createdTime, setCreatedTime] = useState<string>('');
-  const [thumbUrl, setThumbUrl] = useState<string>('');
-  const [coverImage, setCoverImage] = useState<string>('');
 
-  const handleCreatePosts = async () => {
+  const {
+    control,
+    handleSubmit,
+    formState: {errors},
+    reset,
+  } = useForm({
+    defaultValues: {
+      titleVi: '',
+      slug: '',
+      descriptionVi: '',
+      contentVi: '',
+      createdTime: '',
+      // categories: '',
+      thumbUrl: '',
+      coverImage: '',
+    },
+    resolver: yupResolver(schema),
+  });
+  const onSubmit = async (data: UpdatePostsForm) => {
+    console.log('Data form:: ', data);
     try {
       const res = await postsApi.HandleCreatePosts(
         {
           active: isPublic,
-          titleVi: title,
-          slug: slugs,
-          descriptionVi: description,
-          contentVi: contentVi,
-          thumbUrl: thumbUrl,
+          titleVi: data.titleVi,
+          slug: data.slug,
+          descriptionVi: data.descriptionVi,
+          contentVi: data.contentVi,
+          thumbUrl: data.thumbUrl,
           outstanding: isOutstanding,
           categories: [8],
           createdTime: 1705510800000,
+          coverImage: data.coverImage,
         },
         'POST',
       );
+      console.log('res:::: ', res?.data.body);
       if (res?.data.body.status === 'OK') {
         dispatch(createPosts(res?.data.body.data));
+        reset();
         navigation.navigate('Main');
       }
     } catch (error) {}
@@ -117,43 +141,60 @@ const CreatePostsScreeens = ({navigation}: any) => {
       {
         <>
           <SpaceComponent height={10} />
-          <ScrollView>
+          <ScrollView style={styles.contentScrollView}>
             <View style={styles.input}>
               <TextComponent text={'Tiêu đề'} styles={styles.label} />
-              <InputComponent
-                value={title}
-                onChange={val => setTiltle(val)}
+              <InputComponent2
                 placeHolder="Nhập tiêu đề bài viết"
                 allowClear
+                name="titleVi"
+                control={control}
               />
+              {errors.titleVi && (
+                <TextError children={errors.titleVi.message} />
+              )}
             </View>
+            <SpaceComponent height={10} />
+
             <View style={styles.input}>
               <TextComponent text={'Đường dẫn'} styles={styles.label} />
-              <InputComponent
-                value={slugs}
-                onChange={val => setSlug(val)}
-                placeHolder="Nhập đường dẫn bài viết"
+              <InputComponent2
+                placeHolder="Nhập slug bài viết"
                 allowClear
+                name="slug"
+                control={control}
               />
+              {errors.slug && <TextError children={errors.slug.message} />}
             </View>
+            <SpaceComponent height={10} />
+
             <View style={styles.input}>
               <TextComponent text={'Mô tả ngắn'} styles={styles.label} />
-              <InputComponent
-                value={description}
-                onChange={val => setDescription(val)}
-                placeHolder="Nhập tiêu đề tài viết"
+              <InputComponent2
+                placeHolder="Nhập mô tả bài viết"
                 allowClear
+                name="descriptionVi"
+                control={control}
               />
+              {errors.descriptionVi && (
+                <TextError children={errors.descriptionVi.message} />
+              )}
             </View>
+            <SpaceComponent height={10} />
+
             <View style={styles.input}>
               <TextComponent text={'Nội dung'} styles={styles.label} />
-              <InputComponent
-                value={contentVi}
-                onChange={val => setContentVi(val)}
-                placeHolder="Nhập tiêu đề tài viết"
+              <InputComponent2
+                placeHolder="Nhập nội dung bài viết"
                 allowClear
+                name="contentVi"
+                control={control}
               />
+              {errors.descriptionVi && (
+                <TextError children={errors.descriptionVi.message} />
+              )}
             </View>
+            <SpaceComponent height={15} />
 
             <View style={styles.switch}>
               <View style={[styles.input, styles.detailSwitch]}>
@@ -178,57 +219,70 @@ const CreatePostsScreeens = ({navigation}: any) => {
                 />
               </View>
             </View>
-
             <SpaceComponent height={10} />
 
             <View style={styles.input}>
               <TextComponent text={'Ngày tạo'} styles={styles.label} />
-              <InputComponent
-                value={createdTime}
-                onChange={val => setCreatedTime(val)}
-                placeHolder="Nhập tiêu đề tài viết"
+              <InputComponent2
+                placeHolder="Nhập ngày tạo bài viết"
                 allowClear
+                name="createdTime"
+                control={control}
               />
+              {/* {errors.createdTime && (
+                <TextError children={errors.createdTime.message} />
+              )} */}
             </View>
+            <SpaceComponent height={10} />
 
             <View style={styles.input}>
               <TextComponent text={'Danh mục'} styles={styles.label} />
-              <InputComponent
-                value={title}
-                onChange={val => setTiltle(val)}
-                placeHolder="Nhập tiêu đề tài viết"
+              <InputComponent2
+                placeHolder="Nhập danh mục bài viết"
                 allowClear
+                name=""
+                control={control}
               />
+              {errors.descriptionVi && (
+                <TextError children={errors.descriptionVi.message} />
+              )}
             </View>
+            <SpaceComponent height={10} />
+
             <View style={styles.input}>
               <TextComponent text={'Ảnh đại diện'} styles={styles.label} />
-              <InputComponent
-                value={thumbUrl}
-                onChange={val => setThumbUrl(val)}
-                placeHolder="Nhập tiêu đề tài viết"
+              <InputComponent2
+                placeHolder="Nhập ảnh đại diện bài viết"
                 allowClear
+                name="thumbUrl"
+                control={control}
               />
+              {errors.thumbUrl && (
+                <TextError children={errors.thumbUrl.message} />
+              )}
             </View>
+            <SpaceComponent height={10} />
+
             <View style={styles.input}>
               <TextComponent text={'Ảnh cover'} styles={styles.label} />
-              <InputComponent
-                value={coverImage}
-                onChange={val => setCoverImage(val)}
-                placeHolder="Nhập tiêu đề tài viết"
+              <InputComponent2
+                placeHolder="Nhập ảnh cover bài viết"
                 allowClear
+                name="coverImage"
+                control={control}
               />
+              {errors.coverImage && (
+                <TextError children={errors.coverImage.message} />
+              )}
             </View>
+            <SpaceComponent height={10} />
 
-            {/* <Button
+            <SpaceComponent height={20} />
+            <Button
               title="Tạo mới"
               color={appColors.primary}
-              onPress={() => handleCreatePosts()}
-            /> */}
-            <Pressable
-              style={styles.button}
-              onPress={() => handleCreatePosts()}>
-              <Text style={styles.textButton}>Tạo mới</Text>
-            </Pressable>
+              onPress={handleSubmit(onSubmit)}
+            />
           </ScrollView>
         </>
       }

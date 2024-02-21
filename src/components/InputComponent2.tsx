@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     paddingLeft: 2,
     backgroundColor: appColors.white,
-    marginBottom: 19,
+    // marginBottom: 19,
   },
   input: {
     padding: 0,
